@@ -4,6 +4,7 @@ import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
 import org.iesvdm.tienda.repository.ProductoRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,7 @@ class TiendaApplicationTests {
 	@Autowired
 	ProductoRepository prodRepo;
 
-	@Test
+	@org.junit.Test
 	void testAllFabricante() {
 		var listFabs = fabRepo.findAll();
 		
@@ -27,6 +28,8 @@ class TiendaApplicationTests {
 			System.out.println(">>"+f+ ":");
 			f.getProductos().forEach(System.out::println);
 		});
+
+		Assertions.assertEquals(9, listFabs.size());
 	}
 	
 	@Test
@@ -47,8 +50,10 @@ class TiendaApplicationTests {
 	@Test
 	void test1() {
 		var listProds = prodRepo.findAll();
-		//TODO
-	}
+		//Nombres y precios
+		listProds.stream()
+				.map(producto->producto.getNombre()+"="+producto.getPrecio()+"euros")
+	;}
 	
 	
 	/**
