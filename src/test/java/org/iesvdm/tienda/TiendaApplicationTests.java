@@ -8,20 +8,26 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Comparator;
 import java.util.List;
 
 
 @SpringBootTest
-class TiendaApplicationTests {
+public class TiendaApplicationTests {
 
 	@Autowired
 	FabricanteRepository fabRepo;
 	
 	@Autowired
 	ProductoRepository prodRepo;
+    @Autowired
+    private ProductoRepository productoRepository;
+    @Autowired
+    private FabricanteRepository fabricanteRepository;
 
 	@org.junit.Test
-	void testAllFabricante() {
+    public void testAllFabricante() {
 		var listFabs = fabRepo.findAll();
 		
 		listFabs.forEach(f -> {
@@ -62,7 +68,8 @@ class TiendaApplicationTests {
 	@Test
 	void test2() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		listProds.stream()
+				.map(producto->producto.getNombre()+"="+(producto.getPrecio()*1.09)+" dolares");
 	}
 	
 	/**
@@ -71,7 +78,8 @@ class TiendaApplicationTests {
 	@Test
 	void test3() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		listProds.stream()
+				.map(producto ->producto.getNombre().toUpperCase()+"="+producto.getPrecio());
 	}
 	
 	/**
@@ -80,7 +88,8 @@ class TiendaApplicationTests {
 	@Test
 	void test4() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		listFabs.stream()
+				.map(fabricante ->fabricante.getNombre()+" "+fabricante.getNombre().substring(0,1).toUpperCase());
 	}
 	
 	/**
@@ -89,7 +98,8 @@ class TiendaApplicationTests {
 	@Test
 	void test5() {
 		var listFabs = fabRepo.findAll();
-		//TODO		
+		listFabs.stream()
+				.map(cod->cod.getNombre()+"="+cod.getProductos()+"="+cod.getCodigo());
 	}
 	
 	/**
@@ -98,7 +108,11 @@ class TiendaApplicationTests {
 	@Test
 	void test6() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		listFabs.stream().
+				sorted(Comparator.comparing(Fabricante::getNombre).reversed())
+				.map(fabricante->fabricante.getNombre())
+				.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -107,7 +121,13 @@ class TiendaApplicationTests {
 	@Test
 	void test7() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		listProds.stream()
+				.map(producto ->producto.getNombre())
+				.forEach(System.out::println);
+
+		listProds.stream()
+				.sorted(Comparator.comparing(Producto::getPrecio).reversed())
+				.forEach(System.out::println);
 	}
 	
 	/**
@@ -116,7 +136,9 @@ class TiendaApplicationTests {
 	@Test
 	void test8() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		listFabs.stream()
+				.map(fabricante->fabricante.getNombre().indexOf(0,0,4))
+				.forEach(System.out::println);
 	}
 	
 	/**
@@ -125,7 +147,9 @@ class TiendaApplicationTests {
 	@Test
 	void test9() {
 		var listFabs = fabRepo.findAll();
-		//TODO		
+		listFabs.stream()
+				.map(fabricante->fabricante.getNombre().indexOf(2,3,4))
+				.forEach(System.out::println);
 	}
 	
 	/**
@@ -134,7 +158,11 @@ class TiendaApplicationTests {
 	@Test
 	void test10() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		listProds.stream()
+				.min(Comparator.comparing(Producto::getPrecio))
+				.map(producto-> producto.getNombre()+"="+ producto.getPrecio());
+
+				System.out.println(listProds.stream());
 	}
 	
 	/**
