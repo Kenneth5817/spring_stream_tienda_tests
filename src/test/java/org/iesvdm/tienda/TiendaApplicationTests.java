@@ -78,8 +78,8 @@ public class TiendaApplicationTests {
 	@Test
 	void test3() {
 		var listProds = prodRepo.findAll();
-		listProds.stream()
-				.map(producto ->producto.getNombre().toUpperCase()+"="+producto.getPrecio());
+		var prod=listProds.stream()
+				.map(producto ->producto.getNombre().toUpperCase()+"="+producto.getPrecio()).toList();
 	}
 	
 	/**
@@ -88,8 +88,8 @@ public class TiendaApplicationTests {
 	@Test
 	void test4() {
 		var listFabs = fabRepo.findAll();
-		listFabs.stream()
-				.map(fabricante ->fabricante.getNombre()+" "+fabricante.getNombre().substring(0,1).toUpperCase());
+		var fabs=listFabs.stream()
+				.map(fabricante ->fabricante.getNombre()+" "+fabricante.getNombre().substring(0,1).toUpperCase()).toList();
 	}
 	
 	/**
