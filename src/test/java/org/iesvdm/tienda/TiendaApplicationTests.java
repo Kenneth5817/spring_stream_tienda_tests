@@ -1,5 +1,6 @@
 package org.iesvdm.tienda;
 
+import ch.qos.logback.core.CoreConstants;
 import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
@@ -88,8 +89,17 @@ public class TiendaApplicationTests {
 	@Test
 	void test4() {
 		var listFabs = fabRepo.findAll();
-		var fabs=listFabs.stream()
-				.map(fabricante ->fabricante.getNombre()+" "+fabricante.getNombre().substring(0,1).toUpperCase()).toList();
+		var fabs = listFabs.stream()
+				.map(fabricante -> fabricante.getNombre() + " " + fabricante.getNombre().substring(0, 1).toUpperCase())
+				.toList();
+		System.out.println(fabs);
+
+		//oTRA MANERA de hacerlo con Record
+		var listFabs2=fabRepo.findAll();
+		record Tupla (String nombre, String iniciales){}
+		var result=listFabs2.stream()
+				.map(p->new Tupla(p.getNombre(), p.getNombre().substring(0,2).toUpperCase())).toList();
+		result.forEach(tupla -> System.out.println("Nombre"+tupla.nombre()+", Iniciales: "+tupla.iniciales()));
 	}
 	
 	/**
@@ -100,6 +110,12 @@ public class TiendaApplicationTests {
 		var listFabs = fabRepo.findAll();
 		listFabs.stream()
 				.map(cod->cod.getNombre()+"="+cod.getProductos()+"="+cod.getCodigo());
+
+		var listFabs2=fabRepo.findAll();
+		record Tupla (String codigo){}
+		var result=listFabs2.stream()
+				.map(c->new Tupla(c.getCodigo())
+						.toList();
 	}
 	
 	/**
@@ -171,7 +187,10 @@ public class TiendaApplicationTests {
 	@Test
 	void test11() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var prod= listProds.stream()
+				.sorted(Comparator.comparing(Producto::getPrecio).reversed())
+				.limit(1)
+				.map(p->"Nombre"+p.getNombre()+"Precio"+p.getPrecio()).toList();
 	}
 	
 	/**
