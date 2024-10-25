@@ -1,5 +1,6 @@
 package org.iesvdm.tienda;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
@@ -176,18 +177,19 @@ public class TiendaApplicationTests {
 	@Test
 	void test10() {
 		var listProds = prodRepo.findAll();
-		listProds.stream()
+		var prod=listProds.stream()
 				.min(comparing(Producto::getPrecio))
-				.map(producto-> producto.getNombre()+"="+ producto.getPrecio());
+				.map(producto->"NOMBRE: "+ producto.getNombre()+"="+ producto.getPrecio() +"euros");
+				System.out.println(prod);
 
-				System.out.println(listProds.stream());
-
-				var productoBarato= listProds.stream()
-						.sorted(comparing(Producto::getPrecio))
-						.map(producto -> "Nombre: ="+producto.getNombre()+" precio ="+ producto.getPrecio())
-						.limit(1)
-						.findAny();
-				Assertions.assertTrue(productoBarato.orElse(" ").contains("59.99"));
+		//En clase
+		var productoBarato= listProds.stream()
+				.sorted(comparing(Producto::getPrecio))
+				.limit(1)
+				.map(producto -> "Nombre: ="+producto.getNombre()+" precio ="+ producto.getPrecio())
+				.limit(1)
+				.findAny();
+		Assertions.assertTrue(productoBarato.orElse(" ").contains("59.99"));
 	}
 	
 	/**
@@ -200,6 +202,13 @@ public class TiendaApplicationTests {
 				.sorted(comparing(Producto::getPrecio).reversed())
 				.limit(1)
 				.map(p->"Nombre"+p.getNombre()+"Precio"+p.getPrecio()).toList();
+
+		var prodList=listProds.stream()
+				.max(comparing(Producto::getPrecio))
+				.map(p->"Nombre: "+p.getNombre()+"Precio"+p.getPrecio());
+
+		Assertions.assertTrue(listProds.contains(prod));
+		;
 	}
 	
 	/**
