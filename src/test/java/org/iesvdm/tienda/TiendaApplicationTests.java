@@ -178,9 +178,12 @@ public class TiendaApplicationTests {
 				.reduce((prod1, prod2) -> prod1.getPrecio() > prod2.getPrecio() ? prod1 : prod2)
 				.orElse(null);
 
-		// Asegúrate de que hay al menos un producto
+		// Con este assert aseguramos de que hay al menos un producto
 		assertEquals(true, productoMasCaro != null);
 
+		listProds.stream()
+				.max(Comparator.comparing(Producto::getPrecio))
+				.ifPresentOrElse(producto -> System.out.println(producto.getNombre()+producto.getPrecio()),()->System.out.println("Coleción vacia"));
 	}
 	
 	/**
@@ -191,9 +194,13 @@ public class TiendaApplicationTests {
 	void test12() {
 		var listProds = prodRepo.findAll();
 		List<String> nombresProductos = listProds.stream()
-				.filter(prod -> prod.getCodigo() == 2)
+				.filter(prod -> prod.getFabricante().getCodigo() == 2)
 				.map(Producto::getNombre)
 				.toList();
+
+		System.out.println(nombresProductos);
+		Assertions.assertTrue(nombresProductos.contains("Portátil Yoga 520")&&nombresProductos.contains("Portátil Yoga 520"));
+		Assertions.assertEquals(nombresProductos.size(), 2);
 	}
 	
 	/**
@@ -206,8 +213,10 @@ public class TiendaApplicationTests {
 				.filter(prod -> prod.getPrecio() <= 120)
 				.map(Producto::getNombre)
 				.toList();
+
+		Assertions.assertEquals(4, nombresProductos.size());
 	}
-	
+
 	/**
 	 * 14. Lista los productos que tienen un precio mayor o igual a 400€.
 	 */
