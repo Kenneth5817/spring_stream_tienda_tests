@@ -1,5 +1,6 @@
 package org.iesvdm.tienda;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
@@ -101,7 +102,9 @@ public class TiendaApplicationTests {
 	void test5() {
 		var listFabs = fabRepo.findAll();
 		listFabs.stream()
-				.map(cod->cod.getNombre()+"="+cod.getProductos()+"="+cod.getCodigo());
+				.map(cod->cod.getNombre()+"="+cod.getProductos()+"="+cod.getCodigo())
+				.toList()
+				.forEach(System.out::println);
 	}
 	
 	/**
@@ -226,6 +229,8 @@ public class TiendaApplicationTests {
 		List<Producto> productosCaros = listProds.stream()
 				.filter(prod -> prod.getPrecio() >= 400)
 				.toList();
+
+		Assertions.assertEquals(4, productosCaros.size());
 	}
 	
 	/**
@@ -237,6 +242,8 @@ public class TiendaApplicationTests {
 		List<Producto> productosEnRango = listProds.stream()
 				.filter(prod -> prod.getPrecio() >= 80 && prod.getPrecio() <= 300)
 				.toList();
+		Assertions.assertEquals(8,productosEnRango.size());
+
 	}
 	
 	/**
@@ -248,6 +255,9 @@ public class TiendaApplicationTests {
 		List<Producto> productosFiltrados = listProds.stream()
 				.filter(prod -> prod.getPrecio() > 200 && prod.getCodigo() == 6)
 				.toList();
+		System.out.println(productosFiltrados);
+
+		Assertions.assertEquals(1,listProds.size());
 	}
 
 	/**
@@ -258,12 +268,15 @@ public class TiendaApplicationTests {
 		var listProds = prodRepo.findAll();
 
 		// Definimos un Set de códigos de fabricantes
-		Set<Integer> codigosFabricantes = Set.of(1, 3, 5);
+		Set<Integer> cods = Set.of(1, 3, 5);
 
 		// Filtramos productos cuyo código de fabricante está en el Set
-		List<Producto> productosFiltrados = listProds.stream()
-				.filter(prod -> codigosFabricantes.contains(prod.getCodigo()))
+		var productosFiltrados = listProds.stream()
+				.filter(prod -> cods.contains(prod.getFabricante().getCodigo()))
 				.toList();
+		productosFiltrados.forEach(System.out::println);
+		Assertions.assertEquals(5, productosFiltrados.size());
+
 	}
 
 	/**
@@ -273,23 +286,31 @@ public class TiendaApplicationTests {
 	void test18() {
 		var listProds = prodRepo.findAll();
 		List<String> productosEnCentimos = listProds.stream()
-				.map(prod -> String.format("Producto: %s - Precio: %d céntimos",
-						prod.getNombre(),
-						(int) (prod.getPrecio() * 100))) // Convertir a céntimos
+				//Convertimos a centimos
+				.map(prod -> prod.getNombre()+(prod.getPrecio() * 100))
 				.toList();
+				System.out.println(productosEnCentimos);
+
+		Assertions.assertEquals(11, productosEnCentimos.size());
 	}
-	
-	
+
 	/**
 	 * 19. Lista los nombres de los fabricantes cuyo nombre empiece por la letra S
 	 */
 	@Test
 	void test19() {
 		var listFabs = fabRepo.findAll();
-		List<String> nombresFabricantes = listFabs.stream()
-				.filter(fab -> fab.getNombre().startsWith("S"))
+		var nombresFabricantes = listFabs.stream()
+				.filter(fab -> fab.getNombre().startsWith("s"))
 				.map(Fabricante::getNombre)
 				.toList();
+		System.out.println(nombresFabricantes);
+
+		//otra manera de hacerlo, hecho en clase ;)
+		var result=listFabs.stream()
+				.filter(t->t.getNombre().substring(0,1).equalsIgnoreCase("s"))
+				.toList();
+		result.forEach(t->System.out.println("Fabricantes que empiecen por s"+ t.getNombre()));
 	}
 	
 	/**
@@ -299,10 +320,12 @@ public class TiendaApplicationTests {
 	void test20() {
 		var listProds = prodRepo.findAll();
 		List<Producto> productosPortatiles = listProds.stream()
-				.filter(prod -> prod.getNombre().contains("Portátil"))
+				.filter(prod -> prod.getNombre().contains("Portátil") || prod.getNombre().contains("Portatil"))
 				.toList();
+		System.out.println(productosPortatiles);
 	}
-	
+
+
 	/**
 	 * 21. Devuelve una lista con el nombre de todos los productos que contienen la cadena Monitor en el nombre y tienen un precio inferior a 215 €.
 	 */
@@ -311,26 +334,28 @@ public class TiendaApplicationTests {
 		var listProds = prodRepo.findAll();
 		List<String> nombresMonitores = listProds.stream()
 				.filter(prod -> prod.getNombre().contains("Monitor") && prod.getPrecio() < 215)
-				.map(Producto::getNombre) // Obtener solo los nombres
+				.map(Producto::getNombre)
 				.toList();
+		System.out.println(nombresMonitores);
+		Assertions.assertEquals(1, nombresMonitores.size());
 	}
 	
 	/**
 	 * 22. Lista el nombre y el precio de todos los productos que tengan un precio mayor o igual a 180€. 
 	 * Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre (en orden ascendente).
 	 */
+	@Test
 	void test22() {
 		var listProds = prodRepo.findAll();
 		// Filtrar productos con precio mayor o igual a 180€, ordenar por precio y nombre
 		List<Producto> productosFiltrados = listProds.stream()
 				.filter(prod -> prod.getPrecio() >= 180)
-				.sorted(
-						Comparator.comparingDouble(Producto::getPrecio).reversed() // Ordenar por precio (descendente)
-								.thenComparing(Producto::getNombre) // Luego por nombre (ascendente)
-				)
+				.sorted(Comparator.comparingDouble(Producto::getPrecio).reversed()
+								.thenComparing((Producto::getNombre)))
 				.toList();
+			productosFiltrados.forEach(System.out::println);
 	}
-	
+
 	/**
 	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. 
 	 * Ordene el resultado por el nombre del fabricante, por orden alfabético.
