@@ -57,3 +57,59 @@ select * from producto as p where p.nombre like '%Monitor%' and precio < 215;
 
 /**ej22**/
 select nombre, precio from producto as p where p.precio>=180 order by precio desc, nombre ASC;
+
+/**ej23**/
+select * from fabricante as f where nombre order by nombre asc;
+
+/**ej24**/
+select * from producto order by nombre desc limit 1;
+
+/**ej25**/
+select p.nombre from producto p join fabricante f on p.codigo_fabricante=f.codigo
+                          where p.precio>200 and f.nombre like 'Crucial';
+
+/**ej26**/
+select p.* from producto p join fabricante f on p.codigo_fabricante=f.codigo
+           where f.nombre in ('Asus', 'Hewlett-Packard', 'Seagate');
+/**ej27**/
+select   p.nombre, p.precio from producto p join fabricante f on p.codigo_fabricante=f.codigo
+where p.precio >= 180 order by p.precio desc, p.nombre asc;
+/**ej28**/
+select f.nombre, p.nombre from fabricante f
+join producto p on f.codigo =p.codigo_fabricante;
+
+/**ej29**/
+
+/**ej30**/
+
+/**ej31**/
+
+/**ej32**/
+
+/**ej33**/
+
+/**ej34**/
+
+/**ej35**/
+
+/**ej36**/
+
+/**ej37**/
+
+/**ej38**/
+
+/**ej39**/
+
+/**j40**/
+
+/**ej41**/
+
+/**ej42**/
+
+/**ej43**/
+
+/**ej44**/
+
+/**ej45**/
+
+/**ej46**/

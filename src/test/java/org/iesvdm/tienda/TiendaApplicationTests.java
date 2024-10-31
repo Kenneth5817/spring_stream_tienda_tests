@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static java.util.Collections.reverseOrder;
 import static org.junit.Assert.assertEquals;
 
 
@@ -357,20 +357,25 @@ public class TiendaApplicationTests {
 	}
 
 	/**
-	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. 
-	 * Ordene el resultado por el nombre del fabricante, por orden alfabético.
+	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos
+	 * de la base de datos. Ordene el resultado por el nombre del fabricante, por orden alfabético.
 	 */
 	@Test
 	void test23() {
 		var listProds = prodRepo.findAll();
 		// Filtrar y ordenar productos por el nombre del fabricante
-		List<String> productosFiltrados = listProds.stream()
-				.sorted(Comparator.comparing(prod -> prod.getFabricante().getNombre())) // Ordenar por nombre del fabricante
-				.map(prod -> String.format("Producto: %s - Precio: %.2f€ - Fabricante: %s",
-						prod.getNombre(),
-						prod.getPrecio(),
-						prod.getFabricante().getNombre())) // Suponiendo que hay un método getFabricante()
+		var productosFiltrados = listProds.stream()
+				// Ordenamos por nombre del fabricante
+				.sorted(Comparator.comparing(p->p.getFabricante().getNombre()))
+				//String se cambia a otro String al usar el map
+				.map(producto -> producto.getNombre()
+						+ producto.getPrecio()
+						+ producto.getFabricante())
 				.toList();
+		listProds.forEach(System.out::println);
+
+		//Assertions
+		Assertions.assertEquals(11, productosFiltrados.size());
 	}
 	
 	/**
@@ -379,10 +384,15 @@ public class TiendaApplicationTests {
 	@Test
 	void test24() {
 		var listProds = prodRepo.findAll();
+		// Obtener el producto con el precio máximo
 		Producto productoMasCaro = listProds.stream()
-				.max(Comparator.comparingDouble(Producto::getPrecio)) // Obtener el producto con el precio máximo
+				.max(Comparator.comparingDouble(Producto::getPrecio))
 				.orElse(null);
-	}
+
+		listProds.forEach(System.out::println);
+		Assertions.assertEquals(11, listProds.size());
+		 }
+
 	
 	/**
 	 * 25. Devuelve una lista de todos los productos del fabricante Crucial que tengan un precio mayor que 200€.
@@ -394,6 +404,9 @@ public class TiendaApplicationTests {
 		List<Producto> productosCrucial = listProds.stream()
 				.filter(prod -> "Crucial".equals(prod.getFabricante().getNombre()) && prod.getPrecio() > 200)
 				.toList();
+
+		Assertions.assertEquals(1, productosCrucial.size());
+		Assertions.assertEquals(755, productosCrucial.getFirst().getPrecio());
 	}
 	
 	/**
@@ -402,12 +415,20 @@ public class TiendaApplicationTests {
 	@Test
 	void test26() {
 		var listProds = prodRepo.findAll();
-		Set<String> fabricantesPermitidos = Set.of("Asus", "Hewlett-Packard", "Seagate");
-
-		// Filtrar productos de los fabricantes permitidos
-		List<Producto> productosFiltrados = listProds.stream()
-				.filter(prod -> fabricantesPermitidos.contains(prod.getFabricante().getNombre()))
+		Set<String> fabricantesPermitidos =new HashSet<>();
+		fabricantesPermitidos.add("Asus");
+		fabricantesPermitidos.add("Hewlett-Packard");
+		fabricantesPermitidos.add("Seagate");
+		var result=listProds.stream()
+				.filter(p-> fabricantesPermitidos.contains(p.getFabricante().getNombre()))
 				.toList();
+
+
+		result.forEach(System.out::println);
+		Assertions.assertEquals(3, fabricantesPermitidos.size());
+		fabricantesPermitidos.forEach(s->Assertions
+				.assertTrue(result.stream()
+				.anyMatch(p->p.getFabricante().getNombre().equalsIgnoreCase("Seagate"))));
 	}
 	
 	/**
@@ -427,7 +448,15 @@ Monitor 27 LED Full HD |199.25190000000003|Asus
 	@Test
 	void test27() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var listado=listProds.stream()
+				.filter(prod -> prod.getPrecio() > 100)
+				.sorted(Comparator.comparing(Producto:: getPrecio, reverseOrder().thenComparing(p->p.getProducto().getNombre()
+				.map(s->s.getNombre()+"|"+s.getPrecio()+"|"+ s.getFabricante().getNombre()
+				.toList();
+
+				listado.forEach(System.out::println);
+				Assertions.assertEquals(5, listProds.size());
+				Assertions.assertTrue(listado.get(0).contains(0));
 	}
 	
 	/**
@@ -487,7 +516,14 @@ Fabricante: Xiaomi
 	@Test
 	void test28() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		var listado=listFabs.stream()
+				.map(fabricante->"Fabricante: "+fabricante.getNombre()+"\n\n"
+						+"Poductos"+p.getProductos()
+						.stream().map(producto-> producto.getNombre()+"\n")
+						.collect(Collectors.joining())
+						.toList();
+
+				System.out.println(listado);
 	}
 	
 	/**
