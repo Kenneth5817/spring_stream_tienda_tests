@@ -632,14 +632,13 @@ public class TiendaApplicationTests {
 	 */
 	@Test
 	void test34() {
-		var listProds = prodRepo.findAll();
-		var sumaPrecios = listProds.stream()
-				.mapToDouble(Producto::getPrecio)
-				.sum();
+			var listProds = prodRepo.findAll();
+			var sumaPrecios = listProds.stream()
+					.mapToDouble(Producto::getPrecio)
+					.sum();
 
-		System.out.println("Suma de los precios de todos los productos: " + sumaPrecios);
-
-		Assertions.assertTrue(sumaPrecios >= 0.0, "La suma de los precios no debe ser negativa.");
+			System.out.println("Suma de los precios de todos los productos: " + sumaPrecios);
+			Assertions.assertTrue(sumaPrecios >= 0.0, "La suma de los precios no debe ser negativa.");
 	}
 
 	/**
@@ -654,7 +653,9 @@ public class TiendaApplicationTests {
 
 		System.out.println("Número de productos del fabricante Asus: " + numeroProductosAsus);
 
-		Assertions.assertTrue(numeroProductosAsus >= 0, "El número de productos de Asus no debe ser negativo.");
+		/**Assertions**/
+		Assertions.assertEquals(2,numeroProductosAsus);
+		Assertions.assertTrue(numeroProductosAsus == 2);
 	}
 
 	/**
@@ -664,13 +665,16 @@ public class TiendaApplicationTests {
 	void test36() {
 		var listProds = prodRepo.findAll();
 		var mediaPrecioAsus = listProds.stream()
-				.filter(prod -> "Asus".equals(prod.getFabricante().getNombre()))
+				.filter(prod -> (prod.getFabricante().getNombre().equalsIgnoreCase("Asus")))
 				.mapToDouble(Producto::getPrecio)
 				.average()
+				//lo ponemos porque es optional, para evitar devolver null
 				.orElse(0.0);
 
 		System.out.println("Media del precio de todos los productos del fabricante Asus: " + mediaPrecioAsus);
 
+		/**Assertions**/
+		Assertions.assertEquals(223.995, mediaPrecioAsus);
 		Assertions.assertTrue(mediaPrecioAsus >= 0.0, "La media del precio no debe ser negativa.");
 	}
 
@@ -684,7 +688,7 @@ public class TiendaApplicationTests {
 		var listProds = prodRepo.findAll();
 
 		Double[] resultados = listProds.stream()
-				.filter(prod -> "Crucial".equals(prod.getFabricante().getNombre()))
+				.filter(prod -> (prod.getFabricante().getNombre().equalsIgnoreCase("Crucial")))
 				.map(Producto::getPrecio)
 				.reduce(new Double[]{Double.MAX_VALUE, Double.MIN_VALUE, 0.0, 0.0},
 						(acc, precio) -> {
@@ -696,19 +700,39 @@ public class TiendaApplicationTests {
 						},
 						(acc1, acc2) -> acc1);
 
+		//Hecho en clase
+		var result=listProds.stream()
+				.filter(prod -> (prod.getFabricante().getNombre().equalsIgnoreCase("Crucial")))
+				.map(p->new Double[]{
+					p.getPrecio(),p.getPrecio(),p.getPrecio(),1.0})
+				.reduce((doubles, doubles2)->new Double[]{
+						Math.min(doubles[0], doubles2[0]),
+						Math.max(doubles[1], doubles2[1]),
+						doubles[2]+doubles[2],
+						doubles[3]+doubles2[3]})
+				.orElse(new Double[]{});
+
+		System.out.println();
+
+			Double media= result[3]>0 ? result[2] / result[3]: 0.0;
+			System.out.println("El valor minimo: "+result[0]);
+			System.out.println("El valor máximo: "+result[1]);
+			System.out.println("El valor medio: "+media);
+
+
 		double precioMedio = resultados[3] > 0 ? resultados[2] / resultados[3] : 0.0;
 
-		// Imprimir resultados
+		// Imprimimos los resultados
 		System.out.printf("Precio Mínimo: ", resultados[0]);
 		System.out.printf("Precio Máximo: ", resultados[1]);
 		System.out.printf("Precio Medio: ", precioMedio);
 		System.out.println("Número Total de Productos: " + resultados[3]);
 
 
-		Assertions.assertTrue(resultados[3] > 0, "Debe haber al menos un producto.");
-		Assertions.assertEquals(resultados[0], resultados[0], "El precio mínimo debe ser correcto.");
-		Assertions.assertEquals(resultados[1], resultados[1], "El precio máximo debe ser correcto.");
-		Assertions.assertEquals(precioMedio, precioMedio, "La media del precio debe ser correcta.");
+		/**Assertions**/
+		/**Probamos con ambos**/
+		Assertions.assertEquals(4, resultados.length);
+		Assertions.assertEquals(4, result.length);
 	}
 
 	/**
@@ -745,14 +769,11 @@ public class TiendaApplicationTests {
 				.sorted((a, b) -> Integer.compare(Integer.parseInt(b[1]), Integer.parseInt(a[1]))) // Ordenar de forma descendente
 				.collect(Collectors.toList());
 
-		// Imprimir resultados con formato
-		System.out.printf("%-20s #Productos%n", "Fabricante");
+		System.out.printf("Productos", "Fabricante");
 		System.out.println("-".repeat(40));
-		resultados.forEach(entry ->
-				System.out.printf( entry[0], entry[1])
+		resultados.forEach(entry -> System.out.printf( entry[0], entry[1])
 		);
 
-		// Afirmación
 		Assertions.assertFalse(resultados.isEmpty(), "Debe haber al menos un fabricante en la lista.");
 	}
 
@@ -778,6 +799,7 @@ public class TiendaApplicationTests {
 					double avg = 0.0;
 					int count = precios.size();
 
+					//Si el contador es mayor que 0, devolverá min, max y avg
 					if (count > 0) {
 						min = precios.stream().min(Double::compare).orElse(0.0);
 						max = precios.stream().max(Double::compare).orElse(0.0);
@@ -847,6 +869,7 @@ public class TiendaApplicationTests {
 
 		fabricantesConProductos.forEach(System.out::println);
 
+		/**Assertions**/
 		Assertions.assertFalse(fabricantesConProductos.isEmpty(), "Debe haber al menos un fabricante con 2 o más productos.");
 	}
 
@@ -869,8 +892,10 @@ public class TiendaApplicationTests {
 				.map(entry -> String.format("Fabricante: %s, Número de productos: %d", entry.getKey(), entry.getValue()))
 				.collect(Collectors.toList());
 
+		/**Imprimimos**/
 		fabricantesConProductos.forEach(System.out::println);
 
+		/**assertions**/
 		Assertions.assertFalse(fabricantesConProductos.isEmpty(), "Debe haber al menos un fabricante con productos que superen 220 €.");
 	}
 
@@ -889,11 +914,10 @@ public class TiendaApplicationTests {
 				.map(Map.Entry::getKey) // Obtener solo el nombre del fabricante
 				.collect(Collectors.toList());
 
-		// Imprimir resultados
+		// Imprimimos los resultados
 		fabricantesFiltrados.forEach(System.out::println);
 
-		// Afirmaciones
-		Assertions.assertFalse(fabricantesFiltrados.isEmpty(), "Debe haber al menos un fabricante con suma de precios superior a 1000 €.");
+		Assertions.assertFalse(fabricantesFiltrados.isEmpty(), "Al menos un fabricante tiene que haber con suma de precios superior a 1000 €.");
 	}
 
 
@@ -908,17 +932,14 @@ public class TiendaApplicationTests {
 		var fabricantesFiltrados = listProds.stream()
 				.collect(Collectors.groupingBy(prod -> prod.getFabricante().getNombre()))
 				.entrySet().stream()
-				.filter(entry -> entry.getValue().stream()
-						.mapToDouble(Producto::getPrecio)
-						.sum() > 1000)
-				.sorted(Comparator.comparing(entry -> entry.getValue().stream()
-						.mapToDouble(Producto::getPrecio)
-						.sum()))
-				.map(Map.Entry::getKey)
-				.collect(Collectors.toList());
+				.filter(entry -> entry.getValue().stream().mapToDouble(Producto::getPrecio).sum() > 1000)
+				.sorted(Comparator.comparing(entry -> entry.getValue().stream().mapToDouble(Producto::getPrecio).sum()))
+				.map(Map.Entry::getKey).collect(Collectors.toList());
 
+		/**Imprimos los resultados**/
 		fabricantesFiltrados.forEach(System.out::println);
 
+		/**Assertions**/
 		Assertions.assertFalse(fabricantesFiltrados.isEmpty(), "Debe haber al menos un fabricante con suma de precios superior a 1000 €.");
 	}
 
@@ -940,19 +961,16 @@ public class TiendaApplicationTests {
 							.max(Comparator.comparing(Producto::getPrecio)) // Obtener el producto más caro
 							.orElse(null);
 
-					// Retornar el nombre del producto, precio y fabricante si no es nulo
-					return maxProducto != null
-							? String.format("Producto: %s, Precio: %.2f, Fabricante: %s",
-							maxProducto.getNombre(),
-							maxProducto.getPrecio(),
-							entry.getKey())
-							: null;
-				})
+					// Si no es nulo, devolvemos el nombre del producto, precio y fabricante
+					return maxProducto != null ? String.format("Producto: , Precio: , Fabricante: ",
+							//si no te pilla los valores devolverá null
+							maxProducto.getNombre(), maxProducto.getPrecio(), entry.getKey()) : null;})
 				.filter(Objects::nonNull)
 				.sorted()
 				.collect(Collectors.toList());
 
 		productosMasCaros.forEach(System.out::println);
+		//Assertions
 		Assertions.assertFalse(productosMasCaros.isEmpty(), "Debe haber al menos un producto más caro por fabricante.");
 	}
 
@@ -982,14 +1000,11 @@ public class TiendaApplicationTests {
 						.thenComparing(entry -> -entry.getValue().getPrecio())) // Ordenar
 				.collect(Collectors.toList());
 
-		// Imprimir resultados
+		// Imprimimos los resultados
 		productosFiltrados.forEach(entry -> System.out.printf("Fabricante: %s, Producto: %s, Precio: %.2f%n",
 				entry.getKey(), entry.getValue().getNombre(), entry.getValue().getPrecio()));
 
-		// Afirmaciones
+		// Assertions
 		Assertions.assertFalse(productosFiltrados.isEmpty(), "Debe haber al menos un producto que cumpla con la condición.");
 	}
-
-
-
 }

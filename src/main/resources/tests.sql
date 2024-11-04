@@ -108,13 +108,17 @@ select sum(precio) from producto;
 /**ej35**/
 select count(*) as num_productos from producto
      where codigo_fabricante = (select codigo from fabricante where nombre = 'Asus');
-
+/**otra manera de hacerlo (hecho en clase)**/
+select count(p.codigo_fabricante) from producto p join tienda.fabricante f
+    on f.codigo=p.codigo_fabricante where lower(f.nombre)=lower('asus');
 /**ej36**/
 select avg(precio) as media_precio from producto
     where codigo_fabricante = (select codigo from fabricante where nombre = 'Asus');
 
+select avg(precio) as media_precio from producto
+    where codigo_fabricante= (select codigo from fabricante where nombre='Asus');
 /**ej37**/
-select max(precio) AS precio_maximo, min(precio) AS precio_minimo, avg(precio) AS precio_medio,
+select max(precio) AS precio_maximo, min(precio) as precio_minimo, avg(precio) as precio_medio,
     count(*) AS total_productos from producto
     where codigo_fabricante = (select codigo from fabricante where nombre = 'Crucial');
 
