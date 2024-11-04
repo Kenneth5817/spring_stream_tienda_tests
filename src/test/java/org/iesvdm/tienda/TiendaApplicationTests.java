@@ -550,6 +550,7 @@ public class TiendaApplicationTests {
 		sinProd.forEach(System.out::println);
 
 
+		Assertions.assertEquals(9,listFabs.size());
 		Assertions.assertFalse(sinProd.isEmpty(), "Debe haber al menos un fabricante sin productos.");
 	}
 
@@ -565,6 +566,7 @@ public class TiendaApplicationTests {
 
 		System.out.println("Total de productos: " + totalProductos);
 
+		Assertions.assertEquals(11, totalProductos);
 		Assertions.assertTrue(totalProductos >= 0, "El total de productos no puede ser negativo.");
 	}
 
@@ -582,6 +584,7 @@ public class TiendaApplicationTests {
 
 		System.out.println("Número de fabricantes con productos: " + numeroFabricantesConProductos);
 
+		Assertions.assertEquals(7, numeroFabricantesConProductos);
 		Assertions.assertTrue(numeroFabricantesConProductos >= 0, "El número de fabricantes con productos no debe ser negativo.");
 	}
 
@@ -599,7 +602,8 @@ public class TiendaApplicationTests {
 
 		System.out.println("Media del precio de todos los productos: " + mediaPrecio);
 
-		Assertions.assertTrue(mediaPrecio >= 0.0, "La media del precio no debe ser negativa.");
+		/**ASSERTIONS**/
+		Assertions.assertEquals(271.7236363636364, mediaPrecio);
 	}
 
 
@@ -615,13 +619,14 @@ public class TiendaApplicationTests {
 
 		System.out.println("Precio más barato de todos los productos: " + precioMasBarato);
 
+		Assertions.assertEquals(59.99, precioMasBarato.orElse(0.0));
+
 		if (precioMasBarato.isPresent()) {
 			Assertions.assertTrue(precioMasBarato.getAsDouble() >= 0.0, "El precio más barato debe ser cero o mayor.");
 		} else {
 			Assertions.assertTrue(listProds.isEmpty(), "Si no hay precio, la lista de productos debe estar vacía.");
 		}
 	}
-
 	/**
 	 * 34. Calcula la suma de los precios de todos los productos.
 	 */
